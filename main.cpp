@@ -31,7 +31,7 @@ vector<snake_segment> snake;
 SDL_Texture* load_texture(const string &path);
 SDL_Texture* snake_texture = NULL;
 SDL_Texture* food_texture = NULL;
-SDL_Texture* game_over_texture = NULL; 
+SDL_Texture* game_over_texture = NULL;
 
 SDL_Rect game_over_rect;
 
@@ -108,6 +108,14 @@ void handle_input(){
 }
 
 bool load_media(){
+
+    game_over_texture = load_texture("gameover.png");
+
+    if(game_over_texture == NULL){
+        cerr << "Failed to load gameover.png!!\n";
+        return false;
+    }
+
     snake_texture = load_texture("snake.bmp");
     if(snake_texture == NULL){
         cerr << "Failed to load snake.bmp!!\n";
@@ -118,13 +126,6 @@ bool load_media(){
         cerr << "Failed to load food.bmp!!\n";
         return false;
     }
-
-    game_over_texture = load_texture("gameover.png");
-    if(game_over_texture == NULL){
-        cerr << "Failed to load gameover.png!\n";
-        return false;
-    }
-
     return true;
 }
 
@@ -155,8 +156,8 @@ void render_snake(){
     }
 }
 
-void render_snake(){
-    
+void render_game_over(){
+    SDL_RenderCopy(g_renderer,game_over_texture,NULL,&game_over_rect);
 }
 
 bool check_collision_with_food(){
@@ -188,7 +189,6 @@ bool check_self_collision(){
             return true;
         }
     }
-    return false;
 }
 
 int main(int argc, char *args[])
@@ -201,6 +201,10 @@ int main(int argc, char *args[])
         return 1;
     }
     snake.push_back({SCREEN_WIDTH/2,SCREEN_HEIGHT/2});
+    game_over_rect.x = (SCREEN_WIDTH-320)/2;
+    game_over_rect.y = (SCREEN_HEIGHT-240)/2;
+    game_over_rect.w = 320;
+    game_over_rect.h = 240;
     spawn_food();
     bool quit = false;
 
@@ -209,25 +213,33 @@ int main(int argc, char *args[])
         move_snake();
 
         if(check_collision_with_walls()){
-            quit = true;
+            game_over = true;
+            //quit = true;
         }
 
         if(check_self_collision()){
-            quit = true;
+            game_over = true;
+            //quit = true;
         }
 
-        check_collision_with_food();
+        if(!game_over){
+            check_collision_with_food();
+        }
 
         SDL_RenderClear(g_renderer);
 
-        render_snake();
-
-        SDL_Rect food_rect {food.x, food.y, SNAKE_SIZE, SNAKE_SIZE};
-        SDL_RenderCopy(g_renderer,food_texture,NULL,&food_rect);
-
+        if(game_over){
+            render_game_over();
+        }
+        else{
+            render_snake();
+            SDL_Rect food_rect {food.x, food.y, SNAKE_SIZE, SNAKE_SIZE};
+            SDL_RenderCopy(g_renderer,food_texture,NULL,&food_rect);
+        }
+        
         SDL_RenderPresent(g_renderer);
-        SDL_Delay(100);
+        SDL_Delay(75);
     }
     close();
-    return;
+    return 0;
 }
