@@ -109,19 +109,19 @@ void handle_input(){
 
 bool load_media(){
 
-    game_over_texture = load_texture("gameover.png");
+    game_over_texture = load_texture("src/SDL2/resources/gameover.png");
 
     if(game_over_texture == NULL){
         cerr << "Failed to load gameover.png!!\n";
         return false;
     }
 
-    snake_texture = load_texture("snake.bmp");
+    snake_texture = load_texture("src/SDL2/resources/snake.bmp");
     if(snake_texture == NULL){
         cerr << "Failed to load snake.bmp!!\n";
         return false;
     }
-    food_texture = load_texture("food.bmp");
+    food_texture = load_texture("src/SDL2/resources/food.bmp");
     if(food_texture == NULL){
         cerr << "Failed to load food.bmp!!\n";
         return false;
