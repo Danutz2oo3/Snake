@@ -10,6 +10,8 @@ const int SCREEN_HEIGHT = 480;
 
 const int SNAKE_SIZE = 20;
 
+bool game_over = false;
+
 SDL_Window* g_window = NULL;
 SDL_Renderer* g_renderer = NULL;
 
@@ -26,9 +28,12 @@ Food food;
 
 vector<snake_segment> snake;
 
-SDL_Texture *load_texture(const string &path);
-SDL_Texture *snake_texture = NULL;
-SDL_Texture *food_texture = NULL;
+SDL_Texture* load_texture(const string &path);
+SDL_Texture* snake_texture = NULL;
+SDL_Texture* food_texture = NULL;
+SDL_Texture* game_over_texture = NULL; 
+
+SDL_Rect game_over_rect;
 
 int direction_x = 1;//snake initial movement direction
 int direction_y = 0;
@@ -113,6 +118,13 @@ bool load_media(){
         cerr << "Failed to load food.bmp!!\n";
         return false;
     }
+
+    game_over_texture = load_texture("gameover.png");
+    if(game_over_texture == NULL){
+        cerr << "Failed to load gameover.png!\n";
+        return false;
+    }
+
     return true;
 }
 
@@ -143,6 +155,10 @@ void render_snake(){
     }
 }
 
+void render_snake(){
+    
+}
+
 bool check_collision_with_food(){
     snake_segment &head = snake[0];
     if(head.x == food.x && head.y == food.y){
@@ -168,8 +184,11 @@ bool check_self_collision(){
     //iterate through the body segments of the snake
 
     for(size_t i = 1; i < snake.size(); i++){
-        
+        if(head.x == snake[i].x && head.y == snake[i].y){
+            return true;
+        }
     }
+    return false;
 }
 
 int main(int argc, char *args[])
@@ -193,6 +212,10 @@ int main(int argc, char *args[])
             quit = true;
         }
 
+        if(check_self_collision()){
+            quit = true;
+        }
+
         check_collision_with_food();
 
         SDL_RenderClear(g_renderer);
@@ -206,5 +229,5 @@ int main(int argc, char *args[])
         SDL_Delay(100);
     }
     close();
-    return 0;
+    return;
 }
